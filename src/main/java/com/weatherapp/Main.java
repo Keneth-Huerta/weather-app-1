@@ -7,8 +7,22 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.JOptionPane;
 
-
+/**
+ * Clase principal de la aplicación del Widget del Clima.
+ * Inicializa la interfaz de usuario y controla la configuración inicial.
+ * 
+ * La aplicación requiere una API key de OpenWeatherMap para funcionar correctamente.
+ * 
+ * @author Weather App Team
+ * @version 1.0
+ */
 public class Main {
+    /**
+     * Punto de entrada principal de la aplicación.
+     * Configura el aspecto visual, verifica la API key y lanza la interfaz de usuario.
+     * 
+     * @param args Argumentos de línea de comandos (no utilizados)
+     */
     public static void main(String[] args) {
         try {
             // Establecer look and feel nativo del sistema

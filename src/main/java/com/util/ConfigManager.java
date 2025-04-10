@@ -5,19 +5,37 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Gestor de configuración que carga y proporciona acceso a propiedades
+ * almacenadas en el archivo config.properties.
+ * 
+ * Implementa el patrón Singleton para garantizar una única instancia.
+ * 
+ * @author
+ * @version 1.0
+ */
 public class ConfigManager {
     private static Properties properties;
     private static final String propertiesFilePath = "/config.properties";
     private static ConfigManager instance;
     private static boolean configLoaded = false;
-    // Add your valid API key here
+    // Clave API predeterminada
     private static final String DEFAULT_API_KEY = "00a0d0cf1a2317512849d803c85f5e86";
 
+    /**
+     * Constructor privado que carga las propiedades.
+     * Parte del patrón Singleton.
+     */
     private ConfigManager() {
         properties = new Properties();
         loadProperties();
     }
 
+    /**
+     * Obtiene la instancia única del gestor de configuración.
+     * 
+     * @return La instancia de ConfigManager
+     */
     public static ConfigManager getInstance() {
         if (instance == null) {
             instance = new ConfigManager();
@@ -25,6 +43,10 @@ public class ConfigManager {
         return instance;
     }
 
+    /**
+     * Carga las propiedades desde el archivo de configuración.
+     * Si no se puede encontrar el archivo, usa valores predeterminados.
+     */
     private void loadProperties() {
         try (InputStream input = getClass().getResourceAsStream(propertiesFilePath)) {
             if (input == null) {
@@ -53,6 +75,10 @@ public class ConfigManager {
         }
     }
 
+    /**
+     * Establece valores predeterminados para las propiedades.
+     * Se usa cuando no se puede cargar el archivo de configuración.
+     */
     private void setDefaultProperties() {
         // Use the provided API key as default
         properties.setProperty("api.key", DEFAULT_API_KEY);
@@ -62,6 +88,12 @@ public class ConfigManager {
         properties.setProperty("refresh.interval", "1800000");
     }
 
+    /**
+     * Obtiene el valor de una propiedad específica.
+     * 
+     * @param key Clave de la propiedad
+     * @return Valor de la propiedad o null si no existe
+     */
     public static String getProperty(String key) {
         if (instance == null) {
             instance = new ConfigManager();
@@ -69,6 +101,11 @@ public class ConfigManager {
         return properties.getProperty(key);
     }
 
+    /**
+     * Obtiene la clave API de OpenWeatherMap.
+     * 
+     * @return La clave API configurada
+     */
     public static String getApiKey() {
         if (instance == null) {
             instance = new ConfigManager();
@@ -76,6 +113,11 @@ public class ConfigManager {
         return properties.getProperty("api.key");
     }
     
+    /**
+     * Verifica si la configuración se cargó correctamente.
+     * 
+     * @return true si la configuración se cargó correctamente, false en caso contrario
+     */
     public static boolean isConfigLoaded() {
         return configLoaded;
     }

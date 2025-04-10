@@ -9,11 +9,21 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.Normalizer;
 
+/**
+ * Clase principal de la interfaz gráfica que muestra el widget del clima.
+ * Implementa un JFrame ligero y sin bordes que puede ser arrastrado por la pantalla.
+ * 
+ * @author Weather App Team
+ * @version 1.0
+ */
 public class WeatherFrame extends JFrame {
     private JTextArea weatherDisplay;
     private JButton refreshButton;
     private JLabel statusLabel;
 
+    /**
+     * Constructor que inicializa y configura todos los componentes de la interfaz.
+     */
     public WeatherFrame() {
         setTitle("Widget del Clima");
         setSize(300, 250);
@@ -72,38 +82,72 @@ public class WeatherFrame extends JFrame {
         addMouseMotionListener(frameDragListener);
     }
 
-    // Clase para permitir arrastrar el widget
+    /**
+     * Clase interna que permite arrastrar el widget por la pantalla.
+     */
     private class FrameDragListener extends MouseAdapter {
         private final JFrame frame;
         private Point mouseDownCompCoords;
 
+        /**
+         * Constructor que inicializa el listener con la ventana a controlar.
+         * 
+         * @param frame El JFrame que será arrastrable
+         */
         public FrameDragListener(JFrame frame) {
             this.frame = frame;
         }
 
+        /**
+         * Registra la posición inicial del ratón al hacer clic.
+         */
         public void mousePressed(MouseEvent e) {
             mouseDownCompCoords = e.getPoint();
         }
 
+        /**
+         * Actualiza la posición de la ventana mientras se arrastra.
+         */
         public void mouseDragged(MouseEvent e) {
             Point currCoords = e.getLocationOnScreen();
             frame.setLocation(currCoords.x - mouseDownCompCoords.x, currCoords.y - mouseDownCompCoords.y);
         }
     }
 
+    /**
+     * Obtiene el botón de actualización para añadirle listeners externos.
+     * 
+     * @return El botón de actualización
+     */
     public JButton getRefreshButton() {
         return refreshButton;
     }
     
+    /**
+     * Actualiza el texto de la barra de estado.
+     * 
+     * @param text Nuevo texto a mostrar
+     */
     public void setStatusText(String text) {
         statusLabel.setText(text);
     }
 
+    /**
+     * Muestra un mensaje de error en la interfaz.
+     * 
+     * @param message Mensaje de error a mostrar
+     */
     public void displayError(String message) {
         statusLabel.setText("Error: " + message);
         weatherDisplay.setText("No se pudieron obtener los datos del clima.");
     }
 
+    /**
+     * Actualiza la interfaz con los datos del clima recibidos.
+     * 
+     * @param currentWeather Objeto con datos del clima actual
+     * @param forecast Objeto con datos del pronóstico
+     */
     public void updateWeatherDisplay(CurrentWeather currentWeather, Forecast forecast) {
         statusLabel.setText("Última actualización: " + java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss")));
         
@@ -143,7 +187,10 @@ public class WeatherFrame extends JFrame {
     }
     
     /**
-     * Capitaliza la primera letra de una cadena
+     * Capitaliza la primera letra de una cadena.
+     * 
+     * @param input Texto a capitalizar
+     * @return Texto con la primera letra en mayúscula
      */
     private String capitalize(String input) {
         if (input == null || input.isEmpty()) {
@@ -153,7 +200,10 @@ public class WeatherFrame extends JFrame {
     }
     
     /**
-     * Capitaliza la primera letra de cada palabra en una cadena
+     * Capitaliza la primera letra de cada palabra en una cadena.
+     * 
+     * @param input Texto a capitalizar
+     * @return Texto con la primera letra de cada palabra en mayúscula
      */
     private String capitalizeWords(String input) {
         if (input == null || input.isEmpty()) {

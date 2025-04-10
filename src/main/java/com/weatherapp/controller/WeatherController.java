@@ -11,6 +11,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
+/**
+ * Controlador que gestiona la lógica entre la interfaz de usuario y los servicios.
+ * Se encarga de obtener los datos del clima y actualizar la interfaz.
+ * 
+ * @author Weather App Team
+ * @version 1.0
+ */
 public class WeatherController {
 
     private WeatherService weatherService;
@@ -19,6 +26,11 @@ public class WeatherController {
     private Timer autoRefreshTimer;
     private final int REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutos
 
+    /**
+     * Constructor que inicializa el controlador con la interfaz de usuario.
+     * 
+     * @param weatherFrame La interfaz gráfica a controlar
+     */
     public WeatherController(WeatherFrame weatherFrame) {
         this.weatherFrame = weatherFrame;
         
@@ -48,6 +60,9 @@ public class WeatherController {
         }
     }
 
+    /**
+     * Configura los listeners para los elementos interactivos de la interfaz.
+     */
     private void setupListeners() {
         weatherFrame.getRefreshButton().addActionListener(new ActionListener() {
             @Override
@@ -58,6 +73,9 @@ public class WeatherController {
         });
     }
     
+    /**
+     * Configura el temporizador para actualizar automáticamente los datos.
+     */
     private void setupAutoRefresh() {
         try {
             String refreshInterval = ConfigManager.getProperty("refresh.interval");
@@ -82,6 +100,10 @@ public class WeatherController {
         }
     }
 
+    /**
+     * Obtiene los datos del clima y actualiza la interfaz.
+     * Intenta primero con coordenadas, y si falla, usa el nombre de la ciudad.
+     */
     private void fetchWeather() {
         try {
             // Primero intentar con coordenadas (más preciso)

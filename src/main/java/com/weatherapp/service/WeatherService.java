@@ -12,14 +12,30 @@ import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Servicio que procesa los datos del clima obtenidos de la API.
+ * Convierte las respuestas JSON en objetos del modelo.
+ * 
+ * @author Weather App Team
+ * @version 1.0
+ */
 public class WeatherService {
     private final ApiConnector apiConnector;
 
+    /**
+     * Constructor que inicializa el servicio con la clave API.
+     */
     public WeatherService() {
         String apiKey = ConfigManager.getApiKey();
         this.apiConnector = new ApiConnector(apiKey);
     }
 
+    /**
+     * Obtiene el clima actual para una ciudad específica.
+     * 
+     * @param city Nombre de la ciudad
+     * @return Objeto CurrentWeather con los datos del clima, o null si hay error
+     */
     public CurrentWeather getCurrentWeather(String city) {
         try {
             String response = apiConnector.getCurrentWeatherByCity(city);
@@ -30,6 +46,13 @@ public class WeatherService {
         }
     }
     
+    /**
+     * Obtiene el clima actual para unas coordenadas específicas.
+     * 
+     * @param lat Latitud de la ubicación
+     * @param lon Longitud de la ubicación
+     * @return Objeto CurrentWeather con los datos del clima, o null si hay error
+     */
     public CurrentWeather getCurrentWeatherByCoords(double lat, double lon) {
         try {
             String response = apiConnector.getCurrentWeatherByCoords(lat, lon);
@@ -40,6 +63,12 @@ public class WeatherService {
         }
     }
 
+    /**
+     * Obtiene el pronóstico para una ciudad específica.
+     * 
+     * @param city Nombre de la ciudad
+     * @return Objeto Forecast con los datos del pronóstico, o null si hay error
+     */
     public Forecast getWeatherForecast(String city) {
         try {
             String response = apiConnector.getForecastByCity(city);
@@ -50,6 +79,13 @@ public class WeatherService {
         }
     }
     
+    /**
+     * Obtiene el pronóstico para unas coordenadas específicas.
+     * 
+     * @param lat Latitud de la ubicación
+     * @param lon Longitud de la ubicación
+     * @return Objeto Forecast con los datos del pronóstico, o null si hay error
+     */
     public Forecast getWeatherForecastByCoords(double lat, double lon) {
         try {
             String response = apiConnector.getForecastByCoords(lat, lon);
@@ -60,6 +96,12 @@ public class WeatherService {
         }
     }
 
+    /**
+     * Analiza la respuesta JSON del clima actual y crea un objeto CurrentWeather.
+     * 
+     * @param jsonResponse Respuesta JSON como cadena
+     * @return Objeto CurrentWeather con los datos extraídos
+     */
     private CurrentWeather parseCurrentWeather(String jsonResponse) {
         try {
             JSONObject json = new JSONObject(jsonResponse);
@@ -87,6 +129,12 @@ public class WeatherService {
         }
     }
 
+    /**
+     * Analiza la respuesta JSON del pronóstico y crea un objeto Forecast.
+     * 
+     * @param jsonResponse Respuesta JSON como cadena
+     * @return Objeto Forecast con los datos extraídos
+     */
     private Forecast parseForecast(String jsonResponse) {
         try {
             JSONObject json = new JSONObject(jsonResponse);
