@@ -108,6 +108,11 @@ public class WeatherService {
             
             String cityName = json.getString("name");
             
+            // Extraer las coordenadas del objeto coord
+            JSONObject coordData = json.getJSONObject("coord");
+            double latitude = coordData.getDouble("lat");
+            double longitude = coordData.getDouble("lon");
+            
             JSONObject mainData = json.getJSONObject("main");
             double temperature = mainData.getDouble("temp");
             double humidity = mainData.getDouble("humidity");
@@ -117,12 +122,20 @@ public class WeatherService {
             
             JSONArray weatherArray = json.getJSONArray("weather");
             String description = "";
+            String iconCode = "01d"; // Código predeterminado (cielo despejado día)
+            
             if (weatherArray.length() > 0) {
                 JSONObject weatherData = weatherArray.getJSONObject(0);
                 description = weatherData.getString("description");
+                // Extraer el código del icono
+                iconCode = weatherData.getString("icon");
             }
             
-            return new CurrentWeather(cityName, description, temperature, humidity, windSpeed);
+            // Imprimir las coordenadas para prueba
+            System.out.println("Ubicación detectada: " + cityName + " [Lat: " + latitude + ", Lon: " + longitude + "]");
+            System.out.println("Icono del clima: " + iconCode + " - " + description);
+            
+            return new CurrentWeather(cityName, description, temperature, humidity, windSpeed, latitude, longitude, iconCode);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

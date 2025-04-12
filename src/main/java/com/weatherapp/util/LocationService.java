@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 
 /**
@@ -20,6 +21,7 @@ public class LocationService {
     private double latitude = 19.4326;
     private double longitude = -99.1332;
     private String city = "Ciudad de México";
+    private String locality = ""; // Para almacenar la ubicación más específica (colonia/barrio)
     
     /**
      * Constructor que intenta detectar la ubicación del usuario.
@@ -36,13 +38,20 @@ public class LocationService {
                 JSONObject locationData = new JSONObject(jsonResponse);
                 
                 if (locationData.has("status") && "success".equals(locationData.getString("status"))) {
-                    // Traducir el nombre de la ciudad al español si es necesario
+                    // Guardamos ciudad y distrito/colonia si está disponible
                     String cityName = locationData.getString("city");
                     city = translateCityName(cityName);
                     
+                    // Si hay información del distrito o colonia, guardarla
+                    if (locationData.has("district") && !locationData.getString("district").isEmpty()) {
+                        locality = locationData.getString("district");
+                    }
+                    
                     latitude = locationData.getDouble("lat");
                     longitude = locationData.getDouble("lon");
-                    System.out.println("Ubicación detectada (ip-api): " + city + " (" + latitude + ", " + longitude + ")");
+                    
+                    // Imprimir información detallada de ubicación para prueba
+                    printLocationInfo(city, locality, latitude, longitude, "ip-api.com");
                     return;
                 }
             } catch (Exception e) {
@@ -60,7 +69,9 @@ public class LocationService {
                     
                     latitude = locationData.getDouble("latitude");
                     longitude = locationData.getDouble("longitude");
-                    System.out.println("Ubicación detectada (ipapi): " + city + " (" + latitude + ", " + longitude + ")");
+                    
+                    // Imprimir información detallada de ubicación para prueba
+                    printLocationInfo(city, locality, latitude, longitude, "ipapi.co");
                     return;
                 }
             } catch (Exception e) {
@@ -69,11 +80,43 @@ public class LocationService {
             
             // Si llegamos aquí, ningún servicio funcionó correctamente
             System.out.println("Usando ubicación predeterminada: " + city);
+            // Imprimir coordenadas predeterminadas
+            printLocationInfo(city, locality, latitude, longitude, "predeterminada");
             
         } catch (Exception e) {
             System.err.println("Error al obtener la ubicación: " + e.getMessage());
             System.out.println("Usando ubicación predeterminada: " + city);
+            // Imprimir coordenadas predeterminadas en caso de error
+            printLocationInfo(city, locality, latitude, longitude, "predeterminada (error)");
         }
+    }
+    
+    /**
+     * Imprime información detallada de la ubicación detectada para pruebas.
+     * 
+     * @param city Nombre de la ciudad
+     * @param locality Nombre de la colonia o barrio (puede estar vacío)
+     * @param lat Latitud detectada
+     * @param lon Longitud detectada
+     * @param source Fuente de la información de ubicación
+     */
+    private void printLocationInfo(String city, String locality, double lat, double lon, String source) {
+        System.out.println("==============================================");
+        System.out.println("INFORMACIÓN DETALLADA DE UBICACIÓN");
+        System.out.println("==============================================");
+        
+        if (locality != null && !locality.isEmpty()) {
+            System.out.println("Ubicación específica: " + locality);
+            System.out.println("Ciudad: " + city);
+        } else {
+            System.out.println("Ciudad: " + city);
+        }
+        
+        System.out.println("Latitud: " + lat);
+        System.out.println("Longitud: " + lon);
+        System.out.println("Fuente de datos: " + source);
+        System.out.println("URL de Google Maps: https://www.google.com/maps?q=" + lat + "," + lon);
+        System.out.println("==============================================");
     }
     
     /**
@@ -142,7 +185,7 @@ public class LocationService {
             throw new RuntimeException("Error HTTP: " + responseCode);
         }
         
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
         StringBuilder response = new StringBuilder();
         String line;
         
@@ -161,7 +204,7 @@ public class LocationService {
      * @throws Exception Si ocurre un error en la conexión o respuesta
      */
     private String getLocationFromIpApiCom() throws Exception {
-        URL url = new URL("http://ip-api.com/json?lang=es");  // Solicitar respuesta en español
+        URL url = new URL("http://ip-api.com/json?lang=es&fields=status,message,country,city,district,lat,lon");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setConnectTimeout(5000);
@@ -171,7 +214,7 @@ public class LocationService {
             throw new RuntimeException("Error HTTP: " + responseCode);
         }
         
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
         StringBuilder response = new StringBuilder();
         String line;
         
@@ -182,7 +225,7 @@ public class LocationService {
         
         return response.toString();
     }
-
+    
     /**
      * Obtiene la latitud de la ubicación actual.
      * 
@@ -203,10 +246,28 @@ public class LocationService {
     
     /**
      * Obtiene el nombre de la ciudad actual.
+     * Si está disponible, incluye la información de localidad/barrio.
      * 
-     * @return Nombre de la ciudad
+     * @return Nombre de la ubicación completa
      */
     public String getCurrentCity() {
-        return city;
+        if (locality != null && !locality.isEmpty()) {
+            // Debug: imprimir exactamente qué ubicación estamos devolviendo
+            String fullLocation = locality + ", " + city;
+            System.out.println("Devolviendo ubicación específica: " + fullLocation);
+            return fullLocation;
+        } else {
+            System.out.println("Devolviendo solo ciudad: " + city);
+            return city;
+        }
+    }
+    
+    /**
+     * Obtiene el nombre de la localidad/colonia actual.
+     * 
+     * @return Nombre de la localidad/colonia
+     */
+    public String getLocality() {
+        return locality;
     }
 }

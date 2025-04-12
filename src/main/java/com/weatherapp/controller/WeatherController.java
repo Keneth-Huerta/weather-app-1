@@ -110,10 +110,16 @@ public class WeatherController {
             double lat = locationService.getLatitude();
             double lon = locationService.getLongitude();
             
+            // Obtener el nombre de ubicación específica antes de llamar a la API
+            String specificLocation = locationService.getCurrentCity();
+            System.out.println("Usando ubicación específica: " + specificLocation);
+            
             CurrentWeather currentWeather = weatherService.getCurrentWeatherByCoords(lat, lon);
             Forecast forecast = weatherService.getWeatherForecastByCoords(lat, lon);
             
             if (currentWeather != null && forecast != null) {
+                // Sobrescribir el nombre de la ciudad con nuestra ubicación más específica
+                currentWeather.setLocationName(specificLocation);
                 weatherFrame.updateWeatherDisplay(currentWeather, forecast);
                 return;
             }
@@ -124,6 +130,10 @@ public class WeatherController {
             forecast = weatherService.getWeatherForecast(city);
             
             if (currentWeather != null || forecast != null) {
+                // Asegurarnos de usar nuestra ubicación específica
+                if (currentWeather != null) {
+                    currentWeather.setLocationName(specificLocation);
+                }
                 weatherFrame.updateWeatherDisplay(currentWeather, forecast);
             } else {
                 weatherFrame.displayError("No se pudieron obtener datos del clima");

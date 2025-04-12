@@ -20,13 +20,15 @@ public class WeatherFrame extends JFrame {
     private JTextArea weatherDisplay;
     private JButton refreshButton;
     private JLabel statusLabel;
+    private JLabel weatherIconLabel;
+    private JPanel weatherInfoPanel;
 
     /**
      * Constructor que inicializa y configura todos los componentes de la interfaz.
      */
     public WeatherFrame() {
         setTitle("Widget del Clima");
-        setSize(300, 250);
+        setSize(300, 280); // Aumentamos un poco la altura para acomodar el icono
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         
@@ -58,12 +60,24 @@ public class WeatherFrame extends JFrame {
         topPanel.add(titleLabel, BorderLayout.CENTER);
         topPanel.add(refreshButton, BorderLayout.EAST);
         
+        // Panel central con icono y texto del clima
+        weatherInfoPanel = new JPanel(new BorderLayout());
+        weatherInfoPanel.setBackground(new Color(240, 248, 255));
+        
+        // Etiqueta para el icono del clima
+        weatherIconLabel = new JLabel();
+        weatherIconLabel.setHorizontalAlignment(JLabel.CENTER);
+        weatherIconLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
+        
         // Display para el pronóstico
         weatherDisplay = new JTextArea();
         weatherDisplay.setEditable(false);
         weatherDisplay.setBackground(new Color(240, 248, 255));
         weatherDisplay.setFont(new Font("Arial", Font.PLAIN, 14));
-        weatherDisplay.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        weatherDisplay.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
+        
+        weatherInfoPanel.add(weatherIconLabel, BorderLayout.NORTH);
+        weatherInfoPanel.add(weatherDisplay, BorderLayout.CENTER);
         
         // Barra de estado para mensajes
         statusLabel = new JLabel("Obteniendo tu ubicación...");
@@ -71,7 +85,7 @@ public class WeatherFrame extends JFrame {
         statusLabel.setForeground(new Color(100, 100, 100));
         
         mainPanel.add(topPanel, BorderLayout.NORTH);
-        mainPanel.add(weatherDisplay, BorderLayout.CENTER);
+        mainPanel.add(weatherInfoPanel, BorderLayout.CENTER);
         mainPanel.add(statusLabel, BorderLayout.SOUTH);
         
         add(mainPanel);
@@ -156,10 +170,29 @@ public class WeatherFrame extends JFrame {
             return;
         }
 
+        // Actualizar el icono del clima usando el código proporcionado por la API
+        String iconCode = currentWeather.getIconCode();
+        ImageIcon weatherIcon = WeatherIconManager.getIconByCode(iconCode);
+        if (weatherIcon != null) {
+            weatherIconLabel.setIcon(weatherIcon);
+            weatherIconLabel.setVisible(true);
+        } else {
+            // Si no se puede cargar el icono por código, intentar con la descripción
+            weatherIcon = WeatherIconManager.getIconForWeather(currentWeather.getDescription());
+            if (weatherIcon != null) {
+                weatherIconLabel.setIcon(weatherIcon);
+                weatherIconLabel.setVisible(true);
+            } else {
+                weatherIconLabel.setVisible(false);
+            }
+        }
+
         StringBuilder displayText = new StringBuilder();
         // Capitalizar la primera letra de cada palabra de la ciudad
         String cityName = capitalizeWords(currentWeather.getCityName());
-        displayText.append("Clima actual en ").append(cityName).append("\n\n");
+        displayText.append("Clima actual en ").append(cityName).append("\n");
+        displayText.append("Coordenadas: ").append(String.format("%.6f°, %.6f°", currentWeather.getLatitude(), currentWeather.getLongitude())).append("\n\n");
+        
         displayText.append("Temperatura: ").append(String.format("%.1f", currentWeather.getTemperature())).append("°C\n");
         
         // Capitalizar la primera letra de la descripción

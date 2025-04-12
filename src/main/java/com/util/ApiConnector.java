@@ -115,7 +115,8 @@ public class ApiConnector {
             }
         }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader((connection.getInputStream())));
+        // Usar explícitamente UTF-8 para manejar caracteres especiales correctamente
+        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
         StringBuilder response = new StringBuilder();
         String output;
 
